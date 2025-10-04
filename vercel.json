@@ -4,7 +4,10 @@
   "builds": [
     {
       "src": "backend/simple_main.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
     },
     {
       "src": "frontend-vite/package.json",
@@ -26,10 +29,5 @@
   ],
   "env": {
     "GEMINI_API_KEY": "@gemini_api_key"
-  },
-  "functions": {
-    "backend/simple_main.py": {
-      "maxDuration": 30
-    }
   }
 }
