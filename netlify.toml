@@ -1,0 +1,24 @@
+[build]
+  base = "frontend-vite"
+  publish = "frontend-vite/dist"
+  command = "npm run build"
+
+[build.environment]
+  VITE_API_URL = "https://ai-price-aggregator-backend.vercel.app"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://ai-price-aggregator-backend.vercel.app/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[context.production.environment]
+  VITE_API_URL = "https://ai-price-aggregator-backend.vercel.app"
+
+[context.deploy-preview.environment]
+  VITE_API_URL = "https://ai-price-aggregator-backend.vercel.app"

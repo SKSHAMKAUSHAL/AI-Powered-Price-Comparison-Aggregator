@@ -1,0 +1,35 @@
+{
+  "version": 2,
+  "name": "ai-price-aggregator",
+  "builds": [
+    {
+      "src": "backend/simple_main.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "frontend-vite/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "backend/simple_main.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "frontend-vite/$1"
+    }
+  ],
+  "env": {
+    "GEMINI_API_KEY": "@gemini_api_key"
+  },
+  "functions": {
+    "backend/simple_main.py": {
+      "maxDuration": 30
+    }
+  }
+}
