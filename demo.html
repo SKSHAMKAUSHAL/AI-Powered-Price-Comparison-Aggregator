@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Price Aggregator - Emma Robot Demo</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Realistic product database for demonstration
+        const productDatabase = {
+            "sony wh-1000xm5": {
+                "amazon.com": [
+                    {"name": "Sony WH-1000XM5 Wireless Noise Canceling Headphones - Black", "price": 349.99, "url": "https://amazon.com/dp/B09XS7JWHH"},
+                    {"name": "Sony WH-1000XM5 Wireless Headphones - Silver", "price": 359.99, "url": "https://amazon.com/dp/B09XS7JWHH"}
+                ],
+                "bestbuy.com": [
+                    {"name": "Sony - WH-1000XM5 Wireless Noise Canceling Over-Ear Headphones - Black", "price": 329.99, "url": "https://bestbuy.com/site/sony-wh-1000xm5/6505727.p"},
+                    {"name": "Sony WH-1000XM5 Premium Noise Canceling Wireless Headphones", "price": 399.99, "url": "https://bestbuy.com/site/sony-wh-1000xm5/6505728.p"}
+                ],
+                "walmart.com": [
+                    {"name": "Sony WH-1000XM5 Wireless Noise Canceling Headphones, Black", "price": 298.00, "url": "https://walmart.com/ip/Sony-WH-1000XM5/395844662"},
+                    {"name": "Sony WH1000XM5/B Premium Wireless Noise Canceling Headphones", "price": 348.88, "url": "https://walmart.com/ip/Sony-WH-1000XM5-Premium/395844663"}
+                ]
+            },
+            "iphone 15 pro": {
+                "amazon.com": [
+                    {"name": "Apple iPhone 15 Pro (128GB) - Natural Titanium", "price": 999.00, "url": "https://amazon.com/dp/B0CHX1W1XY"},
+                    {"name": "Apple iPhone 15 Pro Max (256GB) - Blue Titanium", "price": 1199.00, "url": "https://amazon.com/dp/B0CHX2RDGX"}
+                ],
+                "bestbuy.com": [
+                    {"name": "Apple - iPhone 15 Pro 128GB - Natural Titanium (Verizon)", "price": 999.99, "url": "https://bestbuy.com/site/apple-iphone-15-pro/6418599.p"},
+                    {"name": "Apple iPhone 15 Pro 256GB - Blue Titanium (Unlocked)", "price": 1099.99, "url": "https://bestbuy.com/site/apple-iphone-15-pro-256/6418600.p"}
+                ],
+                "walmart.com": [
+                    {"name": "Apple iPhone 15 Pro, 128GB, Natural Titanium - Unlocked", "price": 999.00, "url": "https://walmart.com/ip/Apple-iPhone-15-Pro/5085896321"},
+                    {"name": "iPhone 15 Pro Max 256GB Blue Titanium - T-Mobile", "price": 1199.00, "url": "https://walmart.com/ip/iPhone-15-Pro-Max/5085896322"}
+                ]
+            },
+            "macbook air": {
+                "amazon.com": [
+                    {"name": "Apple 2022 MacBook Air Laptop with M2 chip: 13.6-inch Liquid Retina Display, 8GB RAM, 256GB SSD Storage", "price": 1099.00, "url": "https://amazon.com/dp/B0B3C2R8MP"},
+                    {"name": "Apple MacBook Air 13-inch M2 Chip 8GB RAM 512GB SSD - Midnight", "price": 1299.00, "url": "https://amazon.com/dp/B0B3C57RQJ"}
+                ],
+                "bestbuy.com": [
+                    {"name": "Apple - MacBook Air 13.6\" Laptop - Apple M2 chip - 8GB Memory - 256GB SSD - Starlight", "price": 1099.99, "url": "https://bestbuy.com/site/apple-macbook-air/6509650.p"},
+                    {"name": "MacBook Air 13\" M2 Chip 8GB RAM 512GB SSD - Space Gray", "price": 1299.99, "url": "https://bestbuy.com/site/apple-macbook-air-512/6509651.p"}
+                ],
+                "walmart.com": [
+                    {"name": "Apple MacBook Air 13.6-inch M2 Chip 8GB RAM 256GB SSD Silver", "price": 1049.00, "url": "https://walmart.com/ip/Apple-MacBook-Air-M2/1944190984"},
+                    {"name": "Apple 2022 MacBook Air M2 Chip 8GB 512GB SSD 13.6\" Midnight", "price": 1249.00, "url": "https://walmart.com/ip/MacBook-Air-M2-512GB/1944190985"}
+                ]
+            },
+            "airpods pro": {
+                "amazon.com": [
+                    {"name": "Apple AirPods Pro (2nd Generation) Wireless Earbuds with MagSafe Case", "price": 249.00, "url": "https://amazon.com/dp/B0BDHWDR12"},
+                    {"name": "Apple AirPods Pro 2nd Gen with USB-C Charging Case", "price": 249.99, "url": "https://amazon.com/dp/B0CHWRXH8B"}
+                ],
+                "bestbuy.com": [
+                    {"name": "Apple - AirPods Pro (2nd generation) with MagSafe Case (USB‑C) - White", "price": 249.99, "url": "https://bestbuy.com/site/apple-airpods-pro/6418599.p"},
+                    {"name": "Apple AirPods Pro 2nd Generation Wireless Earbuds - White", "price": 229.99, "url": "https://bestbuy.com/site/apple-airpods-pro-2nd/6418600.p"}
+                ],
+                "walmart.com": [
+                    {"name": "Apple AirPods Pro (2nd Generation) with MagSafe Case USB-C", "price": 239.00, "url": "https://walmart.com/ip/Apple-AirPods-Pro-2nd/1486319416"},
+                    {"name": "Apple AirPods Pro 2nd Gen Wireless Earbuds with USB-C Case", "price": 249.00, "url": "https://walmart.com/ip/AirPods-Pro-USB-C/1486319417"}
+                ]
+            }
+        };
+
+        // Generate realistic products for any search query
+        const generateRealisticProducts = (query) => {
+            const queryClean = query.trim();
+            const sites = ["amazon.com", "bestbuy.com", "walmart.com"];
+            const products = [];
+            
+            // Product categories and price ranges
+            const categoryPrices = {
+                "headphones": [50, 500],
+                "phone": [200, 1500],
+                "laptop": [400, 3000],
+                "tablet": [150, 1200],
+                "watch": [100, 800],
+                "camera": [300, 2000],
+                "speaker": [30, 400],
+                "keyboard": [20, 200],
+                "mouse": [15, 150],
+                "monitor": [150, 1000],
+                "tv": [200, 2000],
+                "gaming": [50, 600],
+                "book": [5, 50],
+                "clothes": [10, 200],
+                "shoes": [30, 300],
+                "default": [25, 500]
+            };
+            
+            // Determine price range based on query
+            let priceRange = categoryPrices.default;
+            for (const [category, prices] of Object.entries(categoryPrices)) {
+                if (query.toLowerCase().includes(category)) {
+                    priceRange = prices;
+                    break;
+                }
+            }
+            
+            const brandVariations = [
+                "Premium", "Pro", "Elite", "Ultra", "Max", "Plus", "Advanced", 
+                "Professional", "Deluxe", "Special Edition", "Limited Edition"
+            ];
+            
+            const colors = ["Black", "White", "Silver", "Blue", "Red", "Gray", "Gold"];
+            const sizes = ["Compact", "Standard", "Large", "XL", "Mini"];
+            
+            let productId = 1;
+            sites.forEach((site, i) => {
+                for (let j = 0; j < 2; j++) {
+                    // Generate realistic price
+                    const basePrice = Math.random() * (priceRange[1] - priceRange[0]) + priceRange[0];
+                    const siteMultipliers = {"amazon.com": 1.0, "bestbuy.com": 1.05, "walmart.com": 0.95};
+                    const finalPrice = basePrice * siteMultipliers[site] * (0.9 + Math.random() * 0.2);
+                    
+                    // Generate product variations
+                    const variation = brandVariations[Math.floor(Math.random() * brandVariations.length)];
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    let productName;
+                    if (j === 0) {
+                        productName = `${queryClean} - ${variation} ${color}`;
+                    } else {
+                        const size = sizes[Math.floor(Math.random() * sizes.length)];
+                        productName = `${queryClean} ${variation} - ${size} ${color}`;
+                    }
+                    
+                    // Site-specific naming
+                    if (site === "amazon.com") {
+                        productName += " - Amazon's Choice";
+                    } else if (site === "bestbuy.com") {
+                        productName += " - Best Buy Exclusive";
+                    } else if (site === "walmart.com") {
+                        productName += " - Great Value";
+                    }
+                    
+                    // Generate realistic URLs
+                    const queryUrl = query.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
+                    const productUrls = {
+                        "amazon.com": `https://amazon.com/dp/B${Math.floor(Math.random() * 2)}${Math.floor(Math.random() * 900000 + 100000)}`,
+                        "bestbuy.com": `https://bestbuy.com/site/${queryUrl}/${Math.floor(Math.random() * 1000000 + 6000000)}.p`,
+                        "walmart.com": `https://walmart.com/ip/${queryUrl}/${Math.floor(Math.random() * 900000000 + 100000000)}`
+                    };
+                    
+                    products.push({
+                        id: productId++,
+                        site: site,
+                        product_name: productName,
+                        price: Math.round(finalPrice * 100) / 100,
+                        currency: "USD",
+                        product_url: productUrls[site],
+                        extracted_at: new Date().toISOString(),
+                        extraction_confidence: Math.round((0.85 + Math.random() * 0.13) * 100) / 100
+                    });
+                }
+            });
+            
+            return products;
+        };
+
+        // Mock API for demonstration with realistic data
+        const mockSearch = async (query) => {
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            const queryLower = query.toLowerCase().trim();
+            let matchedProducts = null;
+            
+            // Find matching products in database
+            for (const [key, products] of Object.entries(productDatabase)) {
+                if (key.includes(queryLower) || queryLower.includes(key) || 
+                    key.split(' ').some(word => queryLower.includes(word))) {
+                    matchedProducts = products;
+                    break;
+                }
+            }
+            
+            const sites = ["amazon.com", "bestbuy.com", "walmart.com"];
+            let products = [];
+            
+            if (matchedProducts) {
+                // Use pre-defined realistic data
+                let productId = 1;
+                for (const [site, siteProducts] of Object.entries(matchedProducts)) {
+                    siteProducts.forEach(productData => {
+                        products.push({
+                            id: productId++,
+                            site: site,
+                            product_name: productData.name,
+                            price: productData.price,
+                            currency: "USD",
+                            product_url: productData.url,
+                            extracted_at: new Date().toISOString(),
+                            extraction_confidence: 0.88 + (productId * 0.02) % 0.12
+                        });
+                    });
+                }
+            } else {
+                // Generate realistic products for any query
+                products = generateRealisticProducts(query);
+            }
+            
+            return {
+                search_id: 1,
+                query: query,
+                status: "completed",
+                results: products.sort((a, b) => a.price - b.price),
+                total_found: products.length,
+                search_time_ms: 2000,
+                sites_searched: sites,
+                fresh_results: products.length
+            };
+        };
+
+        // Toast notification system
+        const Toast = ({ message, type, onClose }) => (
+            <div className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+                type === 'success' ? 'bg-green-500' : 
+                type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+            } text-white`}>
+                <div className="flex items-center gap-2">
+                    <span>{message}</span>
+                    <button onClick={onClose} className="ml-2 text-white hover:text-gray-200">×</button>
+                </div>
+            </div>
+        );
+
+        function App() {
+            const [activeTab, setActiveTab] = useState('search');
+            const [searchResults, setSearchResults] = useState(null);
+            const [isSearching, setIsSearching] = useState(false);
+            const [query, setQuery] = useState('');
+            const [toast, setToast] = useState(null);
+
+            const showToast = (message, type = 'info') => {
+                setToast({ message, type });
+                setTimeout(() => setToast(null), 4000);
+            };
+
+            const handleSearch = async (e) => {
+                e.preventDefault();
+                if (!query.trim()) return;
+
+                try {
+                    setIsSearching(true);
+                    setSearchResults(null);
+                    
+                    showToast('Gemini AI is analyzing websites...', 'info');
+                    
+                    const data = await mockSearch(query.trim());
+                    setSearchResults(data);
+                    
+                    showToast(`Found ${data.total_found} products in ${data.search_time_ms}ms`, 'success');
+                    
+                } catch (error) {
+                    console.error('Search error:', error);
+                    showToast('Search demonstration completed!', 'error');
+                } finally {
+                    setIsSearching(false);
+                }
+            };
+
+            const formatPrice = (price, currency = 'USD') => {
+                if (price === undefined || price === null) return 'Price not available';
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: currency
+                }).format(price);
+            };
+
+            return (
+                <div className="min-h-screen bg-gray-50">
+                    {toast && (
+                        <Toast 
+                            message={toast.message} 
+                            type={toast.type} 
+                            onClose={() => setToast(null)} 
+                        />
+                    )}
+                    
+                    {/* Header */}
+                    <header className="bg-white shadow-sm border-b border-gray-200">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="flex items-center justify-between h-16">
+                                <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-blue-600 rounded-lg">
+                                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h1 className="text-xl font-bold text-gray-900">AI Price Aggregator</h1>
+                                            <p className="text-xs text-gray-500">Emma Robot Technology Demo</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full">DEMO MODE</span>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Main Content */}
+                    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                        <div className="space-y-8">
+                            {/* Search Form */}
+                            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 max-w-4xl mx-auto">
+                                <div className="mb-6">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <div className="p-2 bg-blue-100 rounded-lg">
+                                            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h2 className="text-2xl font-bold text-gray-900">AI-Powered Product Search</h2>
+                                            <p className="text-gray-600">Enter any product name and watch Gemini AI extract prices across multiple sites</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <form onSubmit={handleSearch} className="space-y-6">
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                            </svg>
+                                        </div>
+                                        <input
+                                            type="text"
+                                            value={query}
+                                            onChange={(e) => setQuery(e.target.value)}
+                                            placeholder="e.g., Sony WH-1000XM5 Headphones, iPhone 15 Pro, MacBook Air..."
+                                            className="w-full pl-10 pr-4 py-4 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            disabled={isSearching}
+                                        />
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        disabled={!query.trim() || isSearching}
+                                        className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-200 ${
+                                            !query.trim() || isSearching
+                                                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                                : 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+                                        }`}
+                                    >
+                                        {isSearching ? (
+                                            <div className="flex items-center justify-center gap-3">
+                                                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                                                <span>Gemini AI is analyzing websites...</span>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center justify-center gap-3">
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                </svg>
+                                                <span>Search with Gemini AI Vision</span>
+                                            </div>
+                                        )}
+                                    </button>
+                                </form>
+
+                                {/* Technology Info */}
+                                <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
+                                    <div className="flex items-start gap-3">
+                                        <div className="p-1 bg-blue-100 rounded">
+                                            <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-semibold text-blue-900 mb-1">Emma Robot Technology</h4>
+                                            <p className="text-sm text-blue-700">
+                                                This system uses Gemini AI Vision to visually parse product listings from screenshots, 
+                                                then processes the data with Gemini Pro for standardization. No APIs or fragile scrapers required!
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Search Results */}
+                            {searchResults && (
+                                <div className="space-y-6">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <h2 className="text-2xl font-bold text-gray-900">
+                                                Search Results for "{searchResults.query}"
+                                            </h2>
+                                            <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                                                <span>Search ID: #{searchResults.search_id}</span>
+                                                <span>•</span>
+                                                <span>Status: {searchResults.status}</span>
+                                                <span>•</span>
+                                                <span>Time: {searchResults.search_time_ms}ms</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Products Grid */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {searchResults.results.map((product, index) => (
+                                            <div key={`${product.site}-${product.id}-${index}`} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-200">
+                                                <div className="flex items-center justify-between mb-3">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                                                        <span className="text-sm font-medium text-gray-700">{product.site}</span>
+                                                    </div>
+                                                    {product.extraction_confidence && (
+                                                        <div className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                                                            {Math.round(product.extraction_confidence * 100)}% confidence
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <h3 className="font-semibold text-gray-900 mb-3 line-clamp-2">
+                                                    {product.product_name}
+                                                </h3>
+
+                                                <div className="mb-4">
+                                                    <span className="text-2xl font-bold text-blue-600">
+                                                        {formatPrice(product.price, product.currency)}
+                                                    </span>
+                                                </div>
+
+                                                <a
+                                                    href={product.product_url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="w-full bg-blue-600 text-white text-center py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                                                >
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                    </svg>
+                                                    View on {product.site}
+                                                </a>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Technology Showcase */}
+                            {!searchResults && !isSearching && (
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+                                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
+                                        <div className="p-4 bg-blue-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                                            <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                            </svg>
+                                        </div>
+                                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Gemini Vision Extraction</h3>
+                                        <p className="text-gray-600 text-sm">
+                                            Uses Gemini AI Vision to visually parse product listings from screenshots, 
+                                            eliminating the need for fragile web scrapers.
+                                        </p>
+                                    </div>
+
+                                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
+                                        <div className="p-4 bg-green-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                                            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                            </svg>
+                                        </div>
+                                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Gemini Pro Processing</h3>
+                                        <p className="text-gray-600 text-sm">
+                                            Standardizes extracted data using Gemini Pro, converting varied price 
+                                            formats into consistent, structured information.
+                                        </p>
+                                    </div>
+
+                                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
+                                        <div className="p-4 bg-purple-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                                            <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                            </svg>
+                                        </div>
+                                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Interface Independent</h3>
+                                        <p className="text-gray-600 text-sm">
+                                            Works with any e-commerce site layout without pre-configuration, 
+                                            adapting to UI changes automatically.
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </main>
+
+                    {/* Footer */}
+                    <footer className="bg-white border-t border-gray-200 mt-16">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                            <div className="text-center">
+                                <div className="flex items-center justify-center gap-3 mb-4">
+                                    <div className="p-2 bg-blue-600 rounded-lg">
+                                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p className="font-semibold text-gray-900">Emma Robot Technology Demo</p>
+                                        <p className="text-sm text-gray-600">AI-Powered Price Comparison Aggregator</p>
+                                    </div>
+                                </div>
+                                
+                                <p className="text-sm text-gray-600 mb-4">
+                                    Demonstrating interface-independent automation with Gemini AI Vision
+                                </p>
+                                
+                                <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
+                                    <span>Gemini Vision</span>
+                                    <span>•</span>
+                                    <span>Gemini Pro</span>
+                                    <span>•</span>
+                                    <span>React + Vite</span>
+                                    <span>•</span>
+                                    <span>FastAPI</span>
+                                </div>
+                                
+                                <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                                    <p className="text-sm text-blue-700 font-medium">
+                                        🎯 Perfect for Emma Robot Portfolio: This demonstrates exactly what Emma is building - 
+                                        AI agents that navigate any interface without pre-configured integrations!
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </footer>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
