@@ -10,7 +10,6 @@
 |----------|-----|-------------|
 | **Live App** | [https://ai-powered-price-comparison.netlify.app/](https://ai-powered-price-comparison.netlify.app/) | **Full React Application** - Modern UI with real-time AI |
 | **Backend API** | [https://price-comparison-seven.vercel.app/](https://price-comparison-seven.vercel.app/) | **FastAPI + Gemini AI** - Interactive docs at `/docs` |
-| **Instant Demo** | [https://skshamkaushal.github.io/AI-Powered-Price-Comparison-Aggregator/demo.html](https://skshamkaushal.github.io/AI-Powered-Price-Comparison-Aggregator/demo.html) | **No Setup Demo** - Works immediately |
 | **Source Code** | [https://github.com/SKSHAMKAUSHAL/AI-Powered-Price-Comparison-Aggregator](https://github.com/SKSHAMKAUSHAL/AI-Powered-Price-Comparison-Aggregator) | **GitHub Repository** - Complete source code |
 
 ### Quick Test:
