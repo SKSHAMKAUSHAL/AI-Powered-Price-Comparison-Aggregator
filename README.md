@@ -2,12 +2,29 @@
 
 **A Smart Shopping Assistant That Finds the Best Deals Automatically**
 
+## LIVE DEPLOYMENT
+
+### Try It Now - No Setup Required!
+
+| Platform | URL | Description |
+|----------|-----|-------------|
+| **Live App** | [https://ai-powered-price-comparison.netlify.app/](https://ai-powered-price-comparison.netlify.app/) | **Full React Application** - Modern UI with real-time AI |
+| **Backend API** | [https://price-comparison-seven.vercel.app/](https://price-comparison-seven.vercel.app/) | **FastAPI + Gemini AI** - Interactive docs at `/docs` |
+| **Instant Demo** | [https://skshamkaushal.github.io/AI-Powered-Price-Comparison-Aggregator/demo.html](https://skshamkaushal.github.io/AI-Powered-Price-Comparison-Aggregator/demo.html) | **No Setup Demo** - Works immediately |
+| **Source Code** | [https://github.com/SKSHAMKAUSHAL/AI-Powered-Price-Comparison-Aggregator](https://github.com/SKSHAMKAUSHAL/AI-Powered-Price-Comparison-Aggregator) | **GitHub Repository** - Complete source code |
+
+### Quick Test:
+1. **Visit the Live App**: https://ai-powered-price-comparison.netlify.app/
+2. **Search for**: "Gaming Mouse" or "iPhone 15 Pro"
+3. **Watch AI Magic**: Real-time product comparison across multiple sites!
+
+---
+
 ## What This Project Does (In Simple Terms)
 
 Imagine you want to buy headphones online. Instead of visiting Amazon, Best Buy, and Walmart separately to compare prices, this system does it all for you automatically! 
 
 **Here's the magic:** It uses **Artificial Intelligence** to "look" at websites just like a human would, extract product information, and show you all the prices in one place - sorted from cheapest to most expensive.
-
 ## Why This Is Special
 
 ### Traditional Way (Boring & Breaks Often):
@@ -165,7 +182,6 @@ This project demonstrates **exactly** what Emma Robot is building:
 
 ## Future Possibilities
 
-- **Price Alerts** - Get notified when prices drop
 - **Mobile App** - Take it shopping with you
 - **More Sites** - Add international retailers
 - **Smart Recommendations** - AI suggests similar products
@@ -178,3 +194,16 @@ Once running, you can access:
 - **API Backend**: http://localhost:8000  
 - **API Documentation**: http://localhost:8000/docs
 - **System Health**: http://localhost:8000/health
+
+---
+
+## Perfect Emma Robot Portfolio Piece
+
+This project showcases cutting-edge AI technology in a practical, understandable way. It's not just a tech demo - it's a real solution to a common problem that everyone can relate to: finding the best price when shopping online.
+
+### Share These Links:
+Live Application: https://ai-powered-price-comparison.netlify.app/
+GitHub Repository: https://github.com/SKSHAMKAUSHAL/AI-Powered-Price-Comparison-Aggregator
+Instant Demo: https://skshamkaushal.github.io/AI-Powered-Price-Comparison-Aggregator/demo.html
+
+**The future of automation is here, and it's powered by AI vision! **
